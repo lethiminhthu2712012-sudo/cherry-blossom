@@ -13,8 +13,10 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Xử lý Ảnh nền động (Hình 2: bg_cherry_blossom.png)[cite: 21]
-bg_img_path = "assets/ui/bg_cherry_blossom.png"
+# 2. Xử lý Ảnh nền chính (Hỗ trợ cả 2 tên file phổ biến)
+bg_img_path = "assets/ui/cherry_blossom.png"
+if not os.path.exists(bg_img_path):
+    bg_img_path = "assets/ui/bg_cherry_blossom.png"
 
 if os.path.exists(bg_img_path):
     bin_str = get_base64_of_bin_file(bg_img_path)
@@ -39,14 +41,13 @@ else:
     </style>
     """)
 
-# 3. CSS tùy chỉnh để căn giữa hoàn toàn khung nội dung (Ảnh 1)[cite: 20], chữ to, rõ, màu hồng nổi bật
+# 3. CSS căn giữa hoàn toàn khung nội dung, làm nổi bật tiêu đề và nút bấm
 st.html("""
 <style>
-    /* Căn giữa và tạo khung kính mờ sang trọng cho toàn bộ block chính */
     .block-container {
         max-width: 750px;
         padding: 3rem;
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.88);
         border-radius: 35px;
         box-shadow: 0 15px 35px rgba(255, 150, 180, 0.4);
         margin: 5vh auto;
@@ -56,23 +57,23 @@ st.html("""
     }
 
     .main-title {
-        font-size: 55px;
+        font-size: 50px;
         font-weight: 900;
         color: #FF3366;
         text-align: center;
         text-shadow: 3px 3px 0px #FFF275, 6px 6px 12px rgba(0, 0, 0, 0.15);
         letter-spacing: 2px;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
         animation: float 2.5s ease-in-out infinite;
     }
 
     .game-title {
-        font-size: 45px;
+        font-size: 40px;
         font-weight: 900;
         color: #D6336C;
         text-align: center;
         text-shadow: 2px 2px 0px #FFF275;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
     }
 
     @keyframes float {
@@ -80,11 +81,10 @@ st.html("""
         50% { transform: translateY(-8px) rotate(1deg); }
     }
 
-    /* Tùy chỉnh nút bấm chung */
     div.stButton > button {
         background: linear-gradient(180deg, #FF85A1 0%, #FF3366 100%) !important;
         color: white !important;
-        font-size: 22px !important;
+        font-size: 20px !important;
         font-weight: bold !important;
         border-radius: 30px !important;
         border: 4px solid #FFFFFF !important;
@@ -103,11 +103,11 @@ st.html("""
     .game-card {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
-        padding: 25px;
+        padding: 20px;
         border: 3px solid #FF85A1;
         box-shadow: 0 8px 16px rgba(0,0,0,0.08);
         text-align: center;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
         color: #C70039;
     }
@@ -122,53 +122,49 @@ if "selected_game" not in st.session_state:
 if "selected_level" not in st.session_state:
     st.session_state.selected_level = 1
 
-# Hàm phát nhạc nền và hiệu ứng âm thanh
+# Hàm phát hiệu ứng âm thanh
 def play_sound(sfx_name):
     sound_map = {
         "click": "assets/bg_click.mp3",
         "win": "assets/win.mp3",
-        "lose": "assets/lose.mp3",
-        "bgm": "assets/bgm.mp3"
+        "lose": "assets/lose.mp3"
     }
     path = sound_map.get(sfx_name, "")
     if os.path.exists(path):
-        if sfx_name == "bgm":
-            sound_script = f"""
-                <audio autoplay loop>
-                    <source src="app/static/{path}" type="audio/mp3">
-                </audio>
-                <script>
-                    var audio = new Audio("{path}");
-                    audio.loop = true;
-                    audio.play().catch(error => console.log("BGM autoplay blocked"));
-                </script>
-            """
-        else:
-            sound_script = f"""
-                <script>
-                    var audio = new Audio("{path}");
-                    audio.play().catch(error => console.log("Audio blocked"));
-                </script>
-            """
+        sound_script = f"""
+            <script>
+                var audio = new Audio("{path}");
+                audio.play().catch(error => console.log("Audio blocked"));
+            </script>
+        """
         components.html(sound_script, height=0, width=0)
-
-# Tự động phát nhạc nền khi khởi động ứng dụng[cite: 5]
-if "bgm_played" not in st.session_state:
-    play_sound("bgm")
-    st.session_state.bgm_played = True
 
 # ==================== MÀN HÌNH WELCOME ====================
 if st.session_state.screen == "welcome":
     st.html('<div class="main-title">🌸 Game của Thư 🌸</div>')
+    
+    # Nhúng trình phát nhạc nền trực tiếp để người dùng bấm Play nhạc không bị trình duyệt chặn
+    bgm_path = "assets/bgm.mp3"
+    if os.path.exists(bgm_path):
+        st.markdown(f"""
+            <div style="margin-bottom: 20px; text-align: center;">
+                <p style="color: #d6336c; font-weight: bold; margin-bottom: 5px;">🎵 Bật nhạc nền thư giãn:</p>
+                <audio controls autoplay loop style="width: 80%; height: 35px;">
+                    <source src="app/static/{bgm_path}" type="audio/mp3">
+                    Trình duyệt của bạn không hỗ trợ thẻ audio.
+                </audio>
+            </div>
+        """, unsafe_allow_html=True)
+
     st.write("")
     
-    # Hiển thị nút Play dạng Hình 3 (btn_play.png) ở chính giữa có thể ấn được[cite: 22]
+    # Hiển thị nút Play bằng hình ảnh `btn_play.png`
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         btn_img_path = "assets/ui/btn_play.png"
         if os.path.exists(btn_img_path):
             st.image(btn_img_path, use_container_width=True)
-            if st.button("🌸 BẮT ĐẦU CHƠI NGAY 🌸", key="btn_play_image"):
+            if st.button("🌸 BẮT ĐẦU CHƠI NGAY 🌸", key="btn_play_img"):
                 play_sound("click")
                 st.session_state.screen = "select_game"
                 st.rerun()
@@ -180,11 +176,11 @@ if st.session_state.screen == "welcome":
 
 # ==================== MÀN HÌNH CHỌN TRÒ CHƠI ====================
 elif st.session_state.screen == "select_game":
-    st.html('<div class="main-title" style="font-size: 45px;">CHỌN TRÒ CHƠI</div>')
+    st.html('<div class="main-title" style="font-size: 40px;">CHỌN TRÒ CHƠI</div>')
     
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.html('<div class="game-card">🧩 Xếp Hình<br><span style="font-size:15px; color:#666;">Jigsaw Puzzle</span></div>')
+        st.html('<div class="game-card">🧩 Xếp Hình<br><span style="font-size:14px; color:#666;">Jigsaw Puzzle</span></div>')
         if st.button("Chơi Trò 1", key="btn_g1"):
             play_sound("click")
             st.session_state.selected_game = "Xếp Hình"
@@ -192,7 +188,7 @@ elif st.session_state.screen == "select_game":
             st.rerun()
             
     with c2:
-        st.html('<div class="game-card">🔢 Sudoku<br><span style="font-size:15px; color:#666;">Sudoku 9x9</span></div>')
+        st.html('<div class="game-card">🔢 Sudoku<br><span style="font-size:14px; color:#666;">Sudoku 9x9</span></div>')
         if st.button("Chơi Trò 2", key="btn_g2"):
             play_sound("click")
             st.session_state.selected_game = "Sudoku"
@@ -200,7 +196,7 @@ elif st.session_state.screen == "select_game":
             st.rerun()
 
     with c3:
-        st.html('<div class="game-card">🐯 Ghép 3 Ô<br><span style="font-size:15px; color:#666;">Tile Match 3D</span></div>')
+        st.html('<div class="game-card">🐯 Ghép 3 Ô<br><span style="font-size:14px; color:#666;">Tile Match 3D</span></div>')
         if st.button("Chơi Trò 3", key="btn_g3"):
             play_sound("click")
             st.session_state.selected_game = "Ghép 3"
@@ -218,7 +214,7 @@ elif st.session_state.screen == "select_game":
 # ==================== MÀN HÌNH CHỌN 5 MÀN (TẶNG HOA) ====================
 elif st.session_state.screen == "select_level":
     st.html(f'<div class="game-title">{st.session_state.selected_game}</div>')
-    st.markdown("### 🌸 Chọn màn chơi (Level 1 - 5):", help="Chọn cấp độ thử thách")
+    st.markdown("### 🌸 Chọn màn chơi (Level 1 - 5):")
     
     cols = st.columns(5)
     for i in range(1, 6):
@@ -233,9 +229,9 @@ elif st.session_state.screen == "select_level":
                 
             flower_path = "assets/ui/flower_reward.png"
             if os.path.exists(flower_path) and is_completed:
-                st.image(flower_path, width=50)
+                st.image(flower_path, width=45)
             else:
-                st.html("<p style='text-align: center; color: #b0b0b0; font-size: 22px;'>🌱</p>")
+                st.html("<p style='text-align: center; color: #b0b0b0; font-size: 20px;'>🌱</p>")
 
     st.write("<br>", unsafe_allow_html=True)
     if st.button("⬅ Chọn trò chơi khác"):
