@@ -13,13 +13,13 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Cài đặt CSS Nền hoa đào & Giao diện Pink Theme Cute
+# 2. Xử lý riêng phần Ảnh nền động (Tránh lỗi f-string)
 bg_img_path = "assets/ui/bg_cherry_blossom.png"
-css_bg_style = ""
 
 if os.path.exists(bg_img_path):
     bin_str = get_base64_of_bin_file(bg_img_path)
-    css_bg_style = f"""
+    st.markdown(f"""
+    <style>
     .stApp {{
         background-image: url("data:image/png;base64,{bin_str}");
         background-size: cover;
@@ -28,29 +28,30 @@ if os.path.exists(bg_img_path):
         background-attachment: fixed;
         font-family: 'Comic Sans MS', 'Fredoka', cursive, sans-serif;
     }}
-    """
+    </style>
+    """, unsafe_allowed_html=True)
 else:
-    css_bg_style = """
+    st.markdown("""
+    <style>
     .stApp {
         background: linear-gradient(135deg, #ffdeeb 0%, #ffe6fa 50%, #ffd1dc 100%);
     }
-    """
+    </style>
+    """, unsafe_allowed_html=True)
 
-# Ghép CSS nền động và CSS giao diện tĩnh
-st.markdown(f"""
+# 3. CSS Giao diện tĩnh (Dùng chuỗi thường, KHÔNG dùng f-string để tuyệt đối không bao giờ lỗi)
+st.markdown("""
 <style>
-    {css_bg_style}
-
-    .block-container {{
+    .block-container {
         background: rgba(255, 255, 255, 0.5);
         padding: 2.5rem;
         border-radius: 25px;
         backdrop-filter: blur(4px);
         box-shadow: 0 8px 32px 0 rgba(255, 182, 193, 0.37);
         margin-top: 30px;
-    }}
+    }
 
-    .game-title {{
+    .game-title {
         font-size: 50px;
         font-weight: 900;
         color: #FFF275;
@@ -62,14 +63,14 @@ st.markdown(f"""
         letter-spacing: 2px;
         margin-bottom: 25px;
         animation: float 2.5s ease-in-out infinite;
-    }}
+    }
 
-    @keyframes float {{
-        0%, 100% {{ transform: translateY(0px) rotate(-1deg); }}
-        50% {{ transform: translateY(-8px) rotate(1deg); }}
-    }}
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(-1deg); }
+        50% { transform: translateY(-8px) rotate(1deg); }
+    }
 
-    div.stButton > button {{
+    div.stButton > button {
         background: linear-gradient(180deg, #FF85A1 0%, #FF3366 100%) !important;
         color: white !important;
         font-size: 20px !important;
@@ -80,26 +81,26 @@ st.markdown(f"""
         padding: 10px 25px !important;
         transition: all 0.2s ease-in-out !important;
         width: 100%;
-    }}
+    }
 
-    div.stButton > button:hover {{
+    div.stButton > button:hover {
         transform: scale(1.05) !important;
         box-shadow: 0px 12px 20px rgba(255, 51, 102, 0.6) !important;
         background: linear-gradient(180deg, #FF99B2 0%, #FF1A53 100%) !important;
-    }}
+    }
 
-    .game-card {{
+    .game-card {
         background: rgba(255, 255, 255, 0.85);
         border-radius: 20px;
         padding: 20px;
         border: 3px solid #FFB6C1;
         box-shadow: 0 8px 16px rgba(0,0,0,0.08);
         text-align: center;
-    }}
+    }
 </style>
 """, unsafe_allowed_html=True)
 
-# 3. Quản lý trạng thái màn hình
+# 4. Quản lý trạng thái màn hình
 if "screen" not in st.session_state:
     st.session_state.screen = "welcome"
 if "selected_game" not in st.session_state:
@@ -186,7 +187,6 @@ elif st.session_state.screen == "select_level":
     cols = st.columns(5)
     for i in range(1, 6):
         with cols[i-1]:
-            # Kiểm tra trạng thái đã qua màn để tặng hoa
             is_completed = st.session_state.get(f"level_completed_{i}", False)
             
             if st.button(f"Màn {i}", key=f"lvl_{i}"):
@@ -195,7 +195,6 @@ elif st.session_state.screen == "select_level":
                 st.session_state.screen = "play"
                 st.rerun()
                 
-            # Hiển thị hoa vàng thưởng nếu qua màn, ngược lại hiển thị mầm cây
             flower_path = "assets/ui/flower_reward.png"
             if os.path.exists(flower_path) and is_completed:
                 st.image(flower_path, width=45)
