@@ -13,7 +13,7 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Xử lý Ảnh nền động từ tệp cherry_blossom.png (hoặc bg_cherry_blossom.png)
+# 2. Xử lý Ảnh nền động (Hình 2: bg_cherry_blossom.png)[cite: 21]
 bg_img_path = "assets/ui/bg_cherry_blossom.png"
 
 if os.path.exists(bg_img_path):
@@ -39,16 +39,20 @@ else:
     </style>
     """)
 
-# 3. CSS Giao diện tùy chỉnh (Chữ to, căn giữa, màu hồng nổi bật không chìm nền)
+# 3. CSS tùy chỉnh để căn giữa hoàn toàn khung nội dung (Ảnh 1)[cite: 20], chữ to, rõ, màu hồng nổi bật
 st.html("""
 <style>
+    /* Căn giữa và tạo khung kính mờ sang trọng cho toàn bộ block chính */
     .block-container {
-        background: rgba(255, 255, 255, 0.75);
+        max-width: 750px;
         padding: 3rem;
-        border-radius: 30px;
-        backdrop-filter: blur(6px);
-        box-shadow: 0 10px 35px 0 rgba(255, 150, 180, 0.4);
-        margin-top: 30px;
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 35px;
+        box-shadow: 0 15px 35px rgba(255, 150, 180, 0.4);
+        margin: 5vh auto;
+        text-align: center;
+        backdrop-filter: blur(5px);
+        border: 3px solid #FFB6C1;
     }
 
     .main-title {
@@ -76,7 +80,7 @@ st.html("""
         50% { transform: translateY(-8px) rotate(1deg); }
     }
 
-    /* Nút bấm to rõ, chữ to */
+    /* Tùy chỉnh nút bấm chung */
     div.stButton > button {
         background: linear-gradient(180deg, #FF85A1 0%, #FF3366 100%) !important;
         color: white !important;
@@ -97,7 +101,7 @@ st.html("""
     }
 
     .game-card {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
         padding: 25px;
         border: 3px solid #FF85A1;
@@ -118,32 +122,61 @@ if "selected_game" not in st.session_state:
 if "selected_level" not in st.session_state:
     st.session_state.selected_level = 1
 
+# Hàm phát nhạc nền và hiệu ứng âm thanh
 def play_sound(sfx_name):
     sound_map = {
         "click": "assets/bg_click.mp3",
         "win": "assets/win.mp3",
-        "lose": "assets/lose.mp3"
+        "lose": "assets/lose.mp3",
+        "bgm": "assets/bgm.mp3"
     }
     path = sound_map.get(sfx_name, "")
     if os.path.exists(path):
-        sound_script = f"""
-            <script>
-                var audio = new Audio("{path}");
-                audio.play().catch(error => console.log("Audio blocked"));
-            </script>
-        """
+        if sfx_name == "bgm":
+            sound_script = f"""
+                <audio autoplay loop>
+                    <source src="app/static/{path}" type="audio/mp3">
+                </audio>
+                <script>
+                    var audio = new Audio("{path}");
+                    audio.loop = true;
+                    audio.play().catch(error => console.log("BGM autoplay blocked"));
+                </script>
+            """
+        else:
+            sound_script = f"""
+                <script>
+                    var audio = new Audio("{path}");
+                    audio.play().catch(error => console.log("Audio blocked"));
+                </script>
+            """
         components.html(sound_script, height=0, width=0)
+
+# Tự động phát nhạc nền khi khởi động ứng dụng[cite: 5]
+if "bgm_played" not in st.session_state:
+    play_sound("bgm")
+    st.session_state.bgm_played = True
 
 # ==================== MÀN HÌNH WELCOME ====================
 if st.session_state.screen == "welcome":
     st.html('<div class="main-title">🌸 Game của Thư 🌸</div>')
     st.write("")
+    
+    # Hiển thị nút Play dạng Hình 3 (btn_play.png) ở chính giữa có thể ấn được[cite: 22]
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("▶ PLAY NOW"):
-            play_sound("click")
-            st.session_state.screen = "select_game"
-            st.rerun()
+        btn_img_path = "assets/ui/btn_play.png"
+        if os.path.exists(btn_img_path):
+            st.image(btn_img_path, use_container_width=True)
+            if st.button("🌸 BẮT ĐẦU CHƠI NGAY 🌸", key="btn_play_image"):
+                play_sound("click")
+                st.session_state.screen = "select_game"
+                st.rerun()
+        else:
+            if st.button("▶ PLAY NOW"):
+                play_sound("click")
+                st.session_state.screen = "select_game"
+                st.rerun()
 
 # ==================== MÀN HÌNH CHỌN TRÒ CHƠI ====================
 elif st.session_state.screen == "select_game":
