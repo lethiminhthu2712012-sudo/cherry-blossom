@@ -19,7 +19,7 @@ css_bg_style = ""
 
 if os.path.exists(bg_img_path):
     bin_str = get_base64_of_bin_file(bg_img_path)
-    css_bg_style = f'''
+    css_bg_style = f"""
     .stApp {{
         background-image: url("data:image/png;base64,{bin_str}");
         background-size: cover;
@@ -28,14 +28,15 @@ if os.path.exists(bg_img_path):
         background-attachment: fixed;
         font-family: 'Comic Sans MS', 'Fredoka', cursive, sans-serif;
     }}
-    '''
+    """
 else:
-    css_bg_style = '''
+    css_bg_style = """
     .stApp {
         background: linear-gradient(135deg, #ffdeeb 0%, #ffe6fa 50%, #ffd1dc 100%);
     }
-    '''
+    """
 
+# Ghép CSS nền động và CSS giao diện tĩnh
 st.markdown(f"""
 <style>
     {css_bg_style}
