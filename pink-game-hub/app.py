@@ -13,12 +13,12 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Xử lý riêng phần Ảnh nền động (Tránh lỗi f-string)
+# 2. Xử lý Ảnh nền động
 bg_img_path = "assets/ui/bg_cherry_blossom.png"
 
 if os.path.exists(bg_img_path):
     bin_str = get_base64_of_bin_file(bg_img_path)
-    st.markdown(f"""
+    st.html(f"""
     <style>
     .stApp {{
         background-image: url("data:image/png;base64,{bin_str}");
@@ -29,18 +29,18 @@ if os.path.exists(bg_img_path):
         font-family: 'Comic Sans MS', 'Fredoka', cursive, sans-serif;
     }}
     </style>
-    """, unsafe_allowed_html=True)
+    """)
 else:
-    st.markdown("""
+    st.html("""
     <style>
     .stApp {
         background: linear-gradient(135deg, #ffdeeb 0%, #ffe6fa 50%, #ffd1dc 100%);
     }
     </style>
-    """, unsafe_allowed_html=True)
+    """)
 
-# 3. CSS Giao diện tĩnh (Dùng chuỗi thường, KHÔNG dùng f-string để tuyệt đối không bao giờ lỗi)
-st.markdown("""
+# 3. CSS Giao diện tĩnh dùng st.html (Bảo đảm 100% không bị lỗi TypeError)
+st.html("""
 <style>
     .block-container {
         background: rgba(255, 255, 255, 0.5);
@@ -98,7 +98,7 @@ st.markdown("""
         text-align: center;
     }
 </style>
-""", unsafe_allowed_html=True)
+""")
 
 # 4. Quản lý trạng thái màn hình
 if "screen" not in st.session_state:
@@ -132,9 +132,9 @@ if st.session_state.screen == "welcome":
         with col_l2:
             st.image("assets/ui/btn_play.png", use_container_width=True)
     else:
-        st.markdown('<div class="game-title">🎀 PINK GAME HUB 🎀</div>', unsafe_allowed_html=True)
+        st.html('<div class="game-title">🎀 PINK GAME HUB 🎀</div>')
     
-    st.markdown("<br>", unsafe_allowed_html=True)
+    st.write("")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("▶ PLAY NOW"):
@@ -144,11 +144,11 @@ if st.session_state.screen == "welcome":
 
 # ==================== MÀN HÌNH CHỌN TRÒ CHƠI ====================
 elif st.session_state.screen == "select_game":
-    st.markdown('<div class="game-title">CHỌN TRÒ CHƠI</div>', unsafe_allowed_html=True)
+    st.html('<div class="game-title">CHỌN TRÒ CHƠI</div>')
     
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown('<div class="game-card"><h3>🧩 Xếp Hình</h3><p>Jigsaw Puzzle</p></div>', unsafe_allowed_html=True)
+        st.html('<div class="game-card"><h3>🧩 Xếp Hình</h3><p>Jigsaw Puzzle</p></div>')
         if st.button("Chơi Trò 1", key="btn_g1"):
             play_sound("click")
             st.session_state.selected_game = "Xếp Hình"
@@ -156,7 +156,7 @@ elif st.session_state.screen == "select_game":
             st.rerun()
             
     with c2:
-        st.markdown('<div class="game-card"><h3>🔢 Sudoku</h3><p>Sudoku Cute 9x9</p></div>', unsafe_allowed_html=True)
+        st.html('<div class="game-card"><h3>🔢 Sudoku</h3><p>Sudoku Cute 9x9</p></div>')
         if st.button("Chơi Trò 2", key="btn_g2"):
             play_sound("click")
             st.session_state.selected_game = "Sudoku"
@@ -164,14 +164,14 @@ elif st.session_state.screen == "select_game":
             st.rerun()
 
     with c3:
-        st.markdown('<div class="game-card"><h3>🐯 Ghép 3 Ô</h3><p>Tile Match 3D</p></div>', unsafe_allowed_html=True)
+        st.html('<div class="game-card"><h3>🐯 Ghép 3 Ô</h3><p>Tile Match 3D</p></div>')
         if st.button("Chơi Trò 3", key="btn_g3"):
             play_sound("click")
             st.session_state.selected_game = "Ghép 3"
             st.session_state.screen = "select_level"
             st.rerun()
             
-    st.markdown("<br>", unsafe_allowed_html=True)
+    st.write("")
     col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
     with col_b2:
         if st.button("⬅ Trang chủ"):
@@ -181,8 +181,8 @@ elif st.session_state.screen == "select_game":
 
 # ==================== MÀN HÌNH CHỌN 5 MÀN (TẶNG HOA) ====================
 elif st.session_state.screen == "select_level":
-    st.markdown(f'<div class="game-title">{st.session_state.selected_game}</div>', unsafe_allowed_html=True)
-    st.markdown("### 🌸 Chọn màn chơi (Level 1 - 5):")
+    st.html(f'<div class="game-title">{st.session_state.selected_game}</div>')
+    st.write("### 🌸 Chọn màn chơi (Level 1 - 5):")
     
     cols = st.columns(5)
     for i in range(1, 6):
@@ -199,9 +199,9 @@ elif st.session_state.screen == "select_level":
             if os.path.exists(flower_path) and is_completed:
                 st.image(flower_path, width=45)
             else:
-                st.markdown("<p style='text-align: center; color: #b0b0b0; font-size: 18px;'>🌱</p>", unsafe_allowed_html=True)
+                st.html("<p style='text-align: center; color: #b0b0b0; font-size: 18px;'>🌱</p>")
 
-    st.markdown("<br><br>", unsafe_allowed_html=True)
+    st.write("")
     if st.button("⬅ Chọn trò chơi khác"):
         play_sound("click")
         st.session_state.screen = "select_game"
@@ -209,7 +209,7 @@ elif st.session_state.screen == "select_level":
 
 # ==================== MÀN HÌNH CHƠI GAME ====================
 elif st.session_state.screen == "play":
-    st.markdown(f'<div class="game-title">{st.session_state.selected_game} - Màn {st.session_state.selected_level}</div>', unsafe_allowed_html=True)
+    st.html(f'<div class="game-title">{st.session_state.selected_game} - Màn {st.session_state.selected_level}</div>')
     
     game = st.session_state.selected_game
     level = st.session_state.selected_level
@@ -221,7 +221,7 @@ elif st.session_state.screen == "play":
     elif game == "Ghép 3":
         tile_match.play(level)
 
-    st.markdown("<br><hr>", unsafe_allowed_html=True)
+    st.divider()
     if st.button("⬅ Quay lại chọn Màn"):
         play_sound("click")
         st.session_state.screen = "select_level"
