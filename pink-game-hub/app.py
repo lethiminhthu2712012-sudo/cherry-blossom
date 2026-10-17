@@ -7,47 +7,44 @@ import base64
 # 1. Cấu hình trang
 st.set_page_config(page_title="Game của Thư 🌸", page_icon="🎀", layout="centered")
 
-# Hàm mã hóa ảnh nền sang Base64
+# Hàm mã hóa ảnh nền sang Base64 để nhúng thẳng vào CSS (giúp Streamlit Cloud hiển thị 100%)
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Xử lý Ảnh nền chính (Hỗ trợ cả 2 tên file phổ biến)
-bg_img_path = "assets/ui/cherry_blossom.png"
-if not os.path.exists(bg_img_path):
-    bg_img_path = "assets/ui/bg_cherry_blossom.png"
+# 2. Xử lý Ảnh nền chính xác từ thư mục assets/ui/bg_cherry_blossom.png[cite: 21]
+bg_img_path = "assets/ui/bg_cherry_blossom.png"
 
+css_bg = ""
 if os.path.exists(bg_img_path):
     bin_str = get_base64_of_bin_file(bg_img_path)
-    st.html(f"""
-    <style>
+    css_bg = f"""
     .stApp {{
-        background-image: url("data:image/png;base64,{bin_str}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), url("data:image/png;base64,{bin_str}") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
         font-family: 'Comic Sans MS', 'Fredoka', cursive, sans-serif;
     }}
-    </style>
-    """)
+    """
 else:
-    st.html("""
-    <style>
+    css_bg = """
     .stApp {
-        background: linear-gradient(135deg, #ffdeeb 0%, #ffe6fa 50%, #ffd1dc 100%);
+        background: linear-gradient(135deg, #ffdeeb 0%, #ffe6fa 50%, #ffd1dc 100%) !important;
     }
-    </style>
-    """)
+    """
 
-# 3. CSS căn giữa hoàn toàn khung nội dung, làm nổi bật tiêu đề và nút bấm
-st.html("""
+# 3. CSS tổng thể căn giữa, làm nổi bật giao diện
+st.html(f"""
 <style>
-    .block-container {
+    {css_bg}
+
+    .block-container {{
         max-width: 750px;
         padding: 3rem;
-        background: rgba(255, 255, 255, 0.88);
+        background: rgba(255, 255, 255, 0.88) !important;
         border-radius: 35px;
         box-shadow: 0 15px 35px rgba(255, 150, 180, 0.4);
         margin: 5vh auto;
@@ -56,7 +53,7 @@ st.html("""
         border: 3px solid #FFB6C1;
     }
 
-    .main-title {
+    .main-title {{
         font-size: 50px;
         font-weight: 900;
         color: #FF3366;
@@ -65,23 +62,23 @@ st.html("""
         letter-spacing: 2px;
         margin-bottom: 25px;
         animation: float 2.5s ease-in-out infinite;
-    }
+    }}
 
-    .game-title {
+    .game-title {{
         font-size: 40px;
         font-weight: 900;
         color: #D6336C;
         text-align: center;
         text-shadow: 2px 2px 0px #FFF275;
         margin-bottom: 20px;
-    }
+    }}
 
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(-1deg); }
-        50% { transform: translateY(-8px) rotate(1deg); }
-    }
+    @keyframes float {{
+        0%, 100% {{ transform: translateY(0px) rotate(-1deg); }}
+        50% {{ transform: translateY(-8px) rotate(1deg); }}
+    }}
 
-    div.stButton > button {
+    div.stButton > button {{
         background: linear-gradient(180deg, #FF85A1 0%, #FF3366 100%) !important;
         color: white !important;
         font-size: 20px !important;
@@ -92,15 +89,15 @@ st.html("""
         padding: 12px 30px !important;
         transition: all 0.2s ease-in-out !important;
         width: 100%;
-    }
+    }}
 
-    div.stButton > button:hover {
+    div.stButton > button:hover {{
         transform: scale(1.06) !important;
         box-shadow: 0px 14px 25px rgba(255, 51, 102, 0.6) !important;
         background: linear-gradient(180deg, #FF99B2 0%, #FF1A53 100%) !important;
-    }
+    }}
 
-    .game-card {
+    .game-card {{
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
         padding: 20px;
@@ -122,7 +119,6 @@ if "selected_game" not in st.session_state:
 if "selected_level" not in st.session_state:
     st.session_state.selected_level = 1
 
-# Hàm phát hiệu ứng âm thanh
 def play_sound(sfx_name):
     sound_map = {
         "click": "assets/bg_click.mp3",
@@ -143,7 +139,7 @@ def play_sound(sfx_name):
 if st.session_state.screen == "welcome":
     st.html('<div class="main-title">🌸 Game của Thư 🌸</div>')
     
-    # Nhúng trình phát nhạc nền trực tiếp để người dùng bấm Play nhạc không bị trình duyệt chặn
+    # Phát nhạc nền bằng trình phát HTML5 trực quan (tránh bị trình duyệt chặn autoplay)
     bgm_path = "assets/bgm.mp3"
     if os.path.exists(bgm_path):
         st.markdown(f"""
@@ -151,14 +147,12 @@ if st.session_state.screen == "welcome":
                 <p style="color: #d6336c; font-weight: bold; margin-bottom: 5px;">🎵 Bật nhạc nền thư giãn:</p>
                 <audio controls autoplay loop style="width: 80%; height: 35px;">
                     <source src="app/static/{bgm_path}" type="audio/mp3">
-                    Trình duyệt của bạn không hỗ trợ thẻ audio.
                 </audio>
             </div>
-        """, unsafe_allow_html=True)
+        """, unsafe_allowed_html=True)
 
     st.write("")
     
-    # Hiển thị nút Play bằng hình ảnh `btn_play.png`
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         btn_img_path = "assets/ui/btn_play.png"
