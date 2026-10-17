@@ -5,7 +5,7 @@ import os
 import base64
 
 # 1. Cấu hình trang
-st.set_page_config(page_title="Pink Cute Game Hub 🌸", page_icon="🎀", layout="centered")
+st.set_page_config(page_title="Game của Thư 🌸", page_icon="🎀", layout="centered")
 
 # Hàm mã hóa ảnh nền sang Base64
 def get_base64_of_bin_file(bin_file):
@@ -13,7 +13,7 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Xử lý Ảnh nền động
+# 2. Xử lý Ảnh nền động từ tệp cherry_blossom.png (hoặc bg_cherry_blossom.png)
 bg_img_path = "assets/ui/bg_cherry_blossom.png"
 
 if os.path.exists(bg_img_path):
@@ -39,30 +39,36 @@ else:
     </style>
     """)
 
-# 3. CSS Giao diện tĩnh dùng st.html (Bảo đảm 100% không bị lỗi TypeError)
+# 3. CSS Giao diện tùy chỉnh (Chữ to, căn giữa, màu hồng nổi bật không chìm nền)
 st.html("""
 <style>
     .block-container {
-        background: rgba(255, 255, 255, 0.5);
-        padding: 2.5rem;
-        border-radius: 25px;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 8px 32px 0 rgba(255, 182, 193, 0.37);
+        background: rgba(255, 255, 255, 0.75);
+        padding: 3rem;
+        border-radius: 30px;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 10px 35px 0 rgba(255, 150, 180, 0.4);
         margin-top: 30px;
     }
 
-    .game-title {
-        font-size: 50px;
+    .main-title {
+        font-size: 55px;
         font-weight: 900;
-        color: #FFF275;
+        color: #FF3366;
         text-align: center;
-        text-shadow: 
-            3px 3px 0px #FF6B8B,
-            6px 6px 0px #C70039,
-            9px 9px 15px rgba(0, 0, 0, 0.2);
+        text-shadow: 3px 3px 0px #FFF275, 6px 6px 12px rgba(0, 0, 0, 0.15);
         letter-spacing: 2px;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         animation: float 2.5s ease-in-out infinite;
+    }
+
+    .game-title {
+        font-size: 45px;
+        font-weight: 900;
+        color: #D6336C;
+        text-align: center;
+        text-shadow: 2px 2px 0px #FFF275;
+        margin-bottom: 25px;
     }
 
     @keyframes float {
@@ -70,37 +76,41 @@ st.html("""
         50% { transform: translateY(-8px) rotate(1deg); }
     }
 
+    /* Nút bấm to rõ, chữ to */
     div.stButton > button {
         background: linear-gradient(180deg, #FF85A1 0%, #FF3366 100%) !important;
         color: white !important;
-        font-size: 20px !important;
+        font-size: 22px !important;
         font-weight: bold !important;
-        border-radius: 25px !important;
+        border-radius: 30px !important;
         border: 4px solid #FFFFFF !important;
-        box-shadow: 0px 8px 15px rgba(255, 51, 102, 0.4) !important;
-        padding: 10px 25px !important;
+        box-shadow: 0px 8px 20px rgba(255, 51, 102, 0.4) !important;
+        padding: 12px 30px !important;
         transition: all 0.2s ease-in-out !important;
         width: 100%;
     }
 
     div.stButton > button:hover {
-        transform: scale(1.05) !important;
-        box-shadow: 0px 12px 20px rgba(255, 51, 102, 0.6) !important;
+        transform: scale(1.06) !important;
+        box-shadow: 0px 14px 25px rgba(255, 51, 102, 0.6) !important;
         background: linear-gradient(180deg, #FF99B2 0%, #FF1A53 100%) !important;
     }
 
     .game-card {
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 20px;
-        padding: 20px;
-        border: 3px solid #FFB6C1;
+        padding: 25px;
+        border: 3px solid #FF85A1;
         box-shadow: 0 8px 16px rgba(0,0,0,0.08);
         text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: #C70039;
     }
 </style>
 """)
 
-# 4. Quản lý trạng thái màn hình
+# Quản lý trạng thái màn hình
 if "screen" not in st.session_state:
     st.session_state.screen = "welcome"
 if "selected_game" not in st.session_state:
@@ -108,7 +118,6 @@ if "selected_game" not in st.session_state:
 if "selected_level" not in st.session_state:
     st.session_state.selected_level = 1
 
-# Hàm phát âm thanh tương tác
 def play_sound(sfx_name):
     sound_map = {
         "click": "assets/bg_click.mp3",
@@ -127,13 +136,7 @@ def play_sound(sfx_name):
 
 # ==================== MÀN HÌNH WELCOME ====================
 if st.session_state.screen == "welcome":
-    if os.path.exists("assets/ui/btn_play.png"):
-        col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
-        with col_l2:
-            st.image("assets/ui/btn_play.png", use_container_width=True)
-    else:
-        st.html('<div class="game-title">🎀 PINK GAME HUB 🎀</div>')
-    
+    st.html('<div class="main-title">🌸 Game của Thư 🌸</div>')
     st.write("")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -144,11 +147,11 @@ if st.session_state.screen == "welcome":
 
 # ==================== MÀN HÌNH CHỌN TRÒ CHƠI ====================
 elif st.session_state.screen == "select_game":
-    st.html('<div class="game-title">CHỌN TRÒ CHƠI</div>')
+    st.html('<div class="main-title" style="font-size: 45px;">CHỌN TRÒ CHƠI</div>')
     
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.html('<div class="game-card"><h3>🧩 Xếp Hình</h3><p>Jigsaw Puzzle</p></div>')
+        st.html('<div class="game-card">🧩 Xếp Hình<br><span style="font-size:15px; color:#666;">Jigsaw Puzzle</span></div>')
         if st.button("Chơi Trò 1", key="btn_g1"):
             play_sound("click")
             st.session_state.selected_game = "Xếp Hình"
@@ -156,7 +159,7 @@ elif st.session_state.screen == "select_game":
             st.rerun()
             
     with c2:
-        st.html('<div class="game-card"><h3>🔢 Sudoku</h3><p>Sudoku Cute 9x9</p></div>')
+        st.html('<div class="game-card">🔢 Sudoku<br><span style="font-size:15px; color:#666;">Sudoku 9x9</span></div>')
         if st.button("Chơi Trò 2", key="btn_g2"):
             play_sound("click")
             st.session_state.selected_game = "Sudoku"
@@ -164,14 +167,14 @@ elif st.session_state.screen == "select_game":
             st.rerun()
 
     with c3:
-        st.html('<div class="game-card"><h3>🐯 Ghép 3 Ô</h3><p>Tile Match 3D</p></div>')
+        st.html('<div class="game-card">🐯 Ghép 3 Ô<br><span style="font-size:15px; color:#666;">Tile Match 3D</span></div>')
         if st.button("Chơi Trò 3", key="btn_g3"):
             play_sound("click")
             st.session_state.selected_game = "Ghép 3"
             st.session_state.screen = "select_level"
             st.rerun()
             
-    st.write("")
+    st.write("<br>", unsafe_allow_html=True)
     col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
     with col_b2:
         if st.button("⬅ Trang chủ"):
@@ -182,7 +185,7 @@ elif st.session_state.screen == "select_game":
 # ==================== MÀN HÌNH CHỌN 5 MÀN (TẶNG HOA) ====================
 elif st.session_state.screen == "select_level":
     st.html(f'<div class="game-title">{st.session_state.selected_game}</div>')
-    st.write("### 🌸 Chọn màn chơi (Level 1 - 5):")
+    st.markdown("### 🌸 Chọn màn chơi (Level 1 - 5):", help="Chọn cấp độ thử thách")
     
     cols = st.columns(5)
     for i in range(1, 6):
@@ -197,11 +200,11 @@ elif st.session_state.screen == "select_level":
                 
             flower_path = "assets/ui/flower_reward.png"
             if os.path.exists(flower_path) and is_completed:
-                st.image(flower_path, width=45)
+                st.image(flower_path, width=50)
             else:
-                st.html("<p style='text-align: center; color: #b0b0b0; font-size: 18px;'>🌱</p>")
+                st.html("<p style='text-align: center; color: #b0b0b0; font-size: 22px;'>🌱</p>")
 
-    st.write("")
+    st.write("<br>", unsafe_allow_html=True)
     if st.button("⬅ Chọn trò chơi khác"):
         play_sound("click")
         st.session_state.screen = "select_game"
