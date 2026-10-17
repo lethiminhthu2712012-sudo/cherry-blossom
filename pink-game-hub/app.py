@@ -13,8 +13,8 @@ def get_base64_of_bin_file(bin_file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-# 2. Cài đặt CSS Nền hoa đào & Giao diện Cute
-bg_img_path = "assets/images/ui/bg_cherry_blossom.png"
+# 2. Cài đặt CSS Nền hoa đào & Giao diện Pink Theme Cute
+bg_img_path = "assets/ui/bg_cherry_blossom.png"
 css_bg_style = ""
 
 if os.path.exists(bg_img_path):
@@ -63,10 +63,10 @@ st.markdown(f"""
         animation: float 2.5s ease-in-out infinite;
     }}
 
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(-1deg); }
-        50% { transform: translateY(-8px) rotate(1deg); }
-    }
+    @keyframes float {{
+        0%, 100% {{ transform: translateY(0px) rotate(-1deg); }}
+        50% {{ transform: translateY(-8px) rotate(1deg); }}
+    }}
 
     div.stButton > button {{
         background: linear-gradient(180deg, #FF85A1 0%, #FF3366 100%) !important;
@@ -106,7 +106,7 @@ if "selected_game" not in st.session_state:
 if "selected_level" not in st.session_state:
     st.session_state.selected_level = 1
 
-# Hàm phát âm thanh
+# Hàm phát âm thanh tương tác
 def play_sound(sfx_name):
     sound_map = {
         "click": "assets/bg_click.mp3",
@@ -125,10 +125,10 @@ def play_sound(sfx_name):
 
 # ==================== MÀN HÌNH WELCOME ====================
 if st.session_state.screen == "welcome":
-    if os.path.exists("assets/images/ui/logo.png"):
+    if os.path.exists("assets/ui/btn_play.png"):
         col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
         with col_l2:
-            st.image("assets/images/ui/logo.png", use_container_width=True)
+            st.image("assets/ui/btn_play.png", use_container_width=True)
     else:
         st.markdown('<div class="game-title">🎀 PINK GAME HUB 🎀</div>', unsafe_allowed_html=True)
     
@@ -195,7 +195,7 @@ elif st.session_state.screen == "select_level":
                 st.rerun()
                 
             # Hiển thị hoa vàng thưởng nếu qua màn, ngược lại hiển thị mầm cây
-            flower_path = "assets/images/ui/flower_reward.png"
+            flower_path = "assets/ui/flower_reward.png"
             if os.path.exists(flower_path) and is_completed:
                 st.image(flower_path, width=45)
             else:
